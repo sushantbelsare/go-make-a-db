@@ -8,12 +8,12 @@ import (
 
 	"github.com/chzyer/readline"
 	"github.com/sushantbelsare/go-make-a-db/internal/database"
+	"github.com/sushantbelsare/go-make-a-db/internal/config"
 
 	"io"
 	"log"
 )
 
-const dbFilename = "database.json"
 
 type CLI struct {
 	db      *database.Database
@@ -33,7 +33,7 @@ func (c *CLI) InteractiveMode() error {
 		return err
 	}
 	defer func() {
-		if err := c.db.SaveToFile(dbFilename); err != nil {
+		if err := c.db.SaveToFile(config.GetEnv("DB_FILE_NAME", "default")); err != nil {
 			log.Fatalf("Failed to save database: %v", err)
 		}
 		rl.Close()

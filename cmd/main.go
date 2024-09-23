@@ -9,15 +9,17 @@ import (
 
 	"github.com/sushantbelsare/go-make-a-db/internal/cli"
 	"github.com/sushantbelsare/go-make-a-db/internal/database"
+	"github.com/sushantbelsare/go-make-a-db/internal/config"
 )
 
-const dbFilename = "database.json"
-
 func main() {
+
+	config.LoadConfig()
+
 	db := database.NewDatabase()
 
 	// Load the database from file
-	err := db.LoadFromFile(dbFilename)
+	err := db.LoadFromFile(config.GetEnv("DB_FILE_NAME", "default"))
 	if err != nil {
 		log.Fatalf("Failed to load database: %v", err)
 	}
