@@ -1,1 +1,2 @@
+{"operation":"drop","table_name":"my_table"}
 {"operation":"create","table_name":"my_db","values":["col_1","col_2"],"created_at":"2024-09-23T21:47:04.718913534Z"}
