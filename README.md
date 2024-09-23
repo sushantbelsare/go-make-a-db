@@ -23,19 +23,19 @@ SimpleDB is a basic implementation of a relational database in Go, accessible vi
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/simple-db.git
-   cd simple-db
+   git clone https://github.com/sushantbelsare/go-make-a-db.git
+   cd go-make-a-db
    ```
 2. Build the project:
 
    ```bash
-   go build -o simpledb ./cmd
+   go build -o go-make-a-db ./cmd
    ```
 
 3. Run the application:
 
    ```bash
-   ./simpledb
+   ./go-make-a-db
    ```
 
 ## Usage
