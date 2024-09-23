@@ -3,14 +3,17 @@ package cli
 import (
 	_ "bufio"
 	"fmt"
-	"os"
+	// "os"
 	"strings"
 
 	"github.com/chzyer/readline"
 	"github.com/sushantbelsare/go-make-a-db/internal/database"
 
 	"io"
+	"log"
 )
+
+const dbFilename = "database.json"
 
 type CLI struct {
 	db      *database.Database
@@ -29,14 +32,18 @@ func (c *CLI) InteractiveMode() error {
 	if err != nil {
 		return err
 	}
-	defer rl.Close()
+	defer func() {
+		if err := c.db.SaveToFile(dbFilename); err != nil {
+			log.Fatalf("Failed to save database: %v", err)
+		}
+		rl.Close()
+	}()
 
 	for {
 		line, err := rl.Readline()
 		if err != nil { // handle EOF or Ctrl+C
 			if err == readline.ErrInterrupt || err == io.EOF {
 				fmt.Println("Goodbye!")
-				os.Exit(0)
 				break // Exit the loop
 			}
 			return err
@@ -54,13 +61,13 @@ func (c *CLI) InteractiveMode() error {
 			continue
 		}
 
+		if strings.ToLower(args[0]) == "exit" {
+			fmt.Println("Goodbye!")
+			break // Exit the loop
+		}
+
 		err = c.ExecuteCommand(args)
 		if err != nil {
-			if strings.ToLower(args[0]) == "exit" {
-				fmt.Println("Goodbye!")
-				os.Exit(0)
-				break // Exit the loop
-			}
 			fmt.Printf("Error: %v\n", err)
 		}
 	}

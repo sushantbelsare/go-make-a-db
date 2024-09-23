@@ -1,8 +1,11 @@
 package database
 
 import (
-	_ "errors"
+	"encoding/json"
 	"fmt"
+	"io"
+	"log"
+	"os"
 	"sync"
 )
 
@@ -15,6 +18,49 @@ func NewDatabase() *Database {
 	return &Database{
 		tables: make(map[string]*Table),
 	}
+}
+
+// SaveToFile saves the database state to a JSON file
+func (db *Database) SaveToFile(filename string) error {
+	db.mu.RLock()
+	defer db.mu.RUnlock()
+
+	data, err := json.MarshalIndent(db.tables, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	return os.WriteFile(filename, data, 0644)
+}
+
+// LoadFromFile loads the database state from a JSON file
+func (db *Database) LoadFromFile(filename string) error {
+	db.mu.Lock()
+	defer db.mu.Unlock()
+
+	file, err := os.Open(filename)
+	if err != nil {
+		if os.IsNotExist(err) {
+			log.Println("Starting session with a clean database...")
+			return nil // No existing file is not an error
+		}
+		log.Println("Starting session with an exisitng database...")
+		return err
+	}
+	defer file.Close()
+
+	data, err := io.ReadAll(file)
+	if err != nil {
+		return err
+	}
+
+	var tables map[string]*Table
+	if err := json.Unmarshal(data, &tables); err != nil {
+		return err
+	}
+
+	db.tables = tables
+	return nil
 }
 
 func (db *Database) CreateTable(name string, columns []string) error {
